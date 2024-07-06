@@ -1,18 +1,245 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Particle Background</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <div id="particles-js"></div>
-    <div class="content">
-        <h1>Welcome to My Website</h1>
-        <p>This is a sample page with an interactive particle background.</p>
-    </div>
-    <script src="{{ url_for('static', filename='particles.js') }}"></script>
-    <script src="{{ url_for('static', filename='app.js') }}"></script>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Zurin Foundation</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='styles.css') }}"
+        />
+    </head>
+    <body>
+        <nav class="navbar">
+            <div class="navbar-blur"></div>
+            <div class="navbar-content">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Mint</a></li>
+                    <li><a href="#">Contract</a></li>
+                    <li><a href="#">Hiring</a></li>
+                    <li><a href="#">Testnet</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </div>
+            <div class="navbar-content navbar-right">
+                <span id="walletAddress" class="wallet-address"></span>
+                <button id="connectWalletBtn" class="connect-wallet-button">
+                    Connect Wallet
+                </button>
+            </div>
+        </nav>
+
+        <div id="particles-js"></div>
+
+        <div class="content">
+            <h1>Zurin Foundation</h1>
+            <p>
+                The Zurin Foundation pioneers a new era of philanthropy and
+                social impact through Web3 technologies. By leveraging
+                blockchain, we establish unprecedented levels of transparency,
+                efficiency, and trust in every facet of charitable giving and
+                resource allocation. Our mission is to empower individuals and
+                communities worldwide with transformative blockchain solutions,
+                promoting inclusivity and accountability in all our
+                philanthropic endeavors.
+            </p>
+
+            <!-- Form -->
+            <form
+                id="submitForm"
+                style="display: none; margin-top: 50px; text-align: center"
+            >
+                <br />
+                <h1>JOIN TESTNET PROGRAM</h1>
+                <br />
+                <label for="name">Name:</label><br />
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    style="width: 300px; padding: 10px; margin-bottom: 10px"
+                    required
+                /><br /><br />
+                <label for="email">Email Address:</label><br />
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    style="width: 300px; padding: 10px; margin-bottom: 10px"
+                    required
+                /><br /><br />
+                <label for="wallet">Wallet Address:</label><br />
+                <input
+                    type="text"
+                    id="wallet"
+                    name="wallet"
+                    readonly
+                    style="width: 300px; padding: 10px; margin-bottom: 20px"
+                    required
+                /><br />
+                <button
+                    type="submit"
+                    style="
+                        background-color: #4caf50;
+                        color: white;
+                        border: none;
+                        padding: 15px 32px;
+                        text-align: center;
+                        text-decoration: none;
+                        display: inline-block;
+                        font-size: 16px;
+                        margin-bottom: 20px;
+                        cursor: pointer;
+                        border-radius: 5px;
+                    "
+                >
+                    Submit
+                </button>
+            </form>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-blur"></div>
+            <div class="footer-content">
+                <p>&copy; 2024 Zurin Foundation. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <script src="{{ url_for('static', filename='particles.js') }}"></script>
+        <script src="{{ url_for('static', filename='app.js') }}"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const connectWalletBtn =
+                    document.getElementById("connectWalletBtn");
+                const walletAddressElement =
+                    document.getElementById("walletAddress");
+                const submitForm = document.getElementById("submitForm");
+                const walletInput = document.getElementById("wallet");
+
+                // Check if MetaMask is already connected on page load
+                checkMetaMaskConnection();
+
+                connectWalletBtn.addEventListener("click", async function () {
+                    if (connectWalletBtn.textContent === "Connect Wallet") {
+                        await connectWallet();
+                    } else {
+                        disconnectWallet();
+                    }
+                });
+
+                submitForm.addEventListener("submit", async function (event) {
+                    event.preventDefault();
+                    const name = document.getElementById("name").value;
+                    const email = document.getElementById("email").value;
+                    const wallet = walletInput.value;
+
+                    try {
+                        // Send form data to backend
+                        const response = await fetch("/submit-form", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ name, email, wallet }),
+                        });
+
+                        if (!response.ok) {
+                            throw new Error("Form submission failed");
+                        }
+
+                        const data = await response.json();
+                        console.log(
+                            "Form submitted successfully:",
+                            data.message,
+                        );
+                        alert("Form submitted successfully!");
+                        submitForm.reset();
+                    } catch (error) {
+                        console.error("Form submission error:", error);
+                        alert(
+                            "Form submission failed. Please try again later.",
+                        );
+                    }
+                });
+
+                async function checkMetaMaskConnection() {
+                    if (window.ethereum && window.ethereum.selectedAddress) {
+                        const address = window.ethereum.selectedAddress;
+                        displayWalletAddress(address);
+                        connectWalletBtn.textContent = "Disconnect";
+                        showForm();
+                    }
+                }
+
+                async function connectWallet() {
+                    if (window.ethereum) {
+                        try {
+                            // Request account access
+                            const accounts = await window.ethereum.request({
+                                method: "eth_requestAccounts",
+                            });
+                            const address = accounts[0]; // Get the first account address
+                            displayWalletAddress(address);
+                            connectWalletBtn.textContent = "Disconnect";
+                            walletInput.value = address; // Set wallet address in the form
+                            showForm();
+                            alert("Connected to MetaMask!");
+                        } catch (error) {
+                            console.error(error);
+                            alert(
+                                "MetaMask connection failed. Please try again or install MetaMask.",
+                            );
+                        }
+                    } else {
+                        alert(
+                            "MetaMask is not installed. Please install MetaMask to connect.",
+                        );
+                    }
+                }
+
+                async function disconnectWallet() {
+                    if (window.ethereum) {
+                        try {
+                            await window.ethereum.disconnect();
+                            displayWalletAddress("");
+                            connectWalletBtn.textContent = "Connect Wallet";
+                            walletInput.value = ""; // Clear wallet address in the form
+                            hideForm();
+                            alert("Disconnected from MetaMask.");
+                        } catch (error) {
+                            console.error(error);
+                            alert("Failed to disconnect MetaMask.");
+                        }
+                    }
+                }
+
+                function displayWalletAddress(address) {
+                    if (address) {
+                        // Display only first and last 4 characters
+                        const shortenedAddress = `${address.substring(0, 4)}...${address.substring(address.length - 4)}`;
+                        walletAddressElement.textContent = shortenedAddress;
+                        walletAddressElement.style.display = "inline";
+                        walletAddressElement.classList.add(
+                            "wallet-address-visible",
+                        );
+                    } else {
+                        walletAddressElement.textContent = "";
+                        walletAddressElement.style.display = "none";
+                        walletAddressElement.classList.remove(
+                            "wallet-address-visible",
+                        );
+                    }
+                }
+
+                function showForm() {
+                    submitForm.style.display = "block";
+                }
+
+                function hideForm() {
+                    submitForm.style.display = "none";
+                }
+            });
+        </script>
+    </body>
 </html>

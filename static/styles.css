@@ -7,11 +7,107 @@ body, html {
   font-family: Arial, sans-serif;
 }
 
-#particles-js {
-  position: absolute;
+/* Navigation Bar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
-  background: #000;
+  height: 60px;
+  background-color: rgba(0, 0, 0, 0.3); /* Fallback color with opacity */
+  backdrop-filter: blur(10px); /* Blur effect for modern browsers */
+  z-index: 2;
+  display: flex;
+  justify-content: space-between; /* Align items at opposite ends */
+  align-items: center; /* Center vertically */
+}
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-content ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-content ul li {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+.navbar-content ul li a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.navbar-content ul li a:hover {
+  color: #f0f0f0;
+}
+
+/* Right-aligned content */
+.navbar-right {
+  margin-left: auto; /* Pushes the content to the right */
+  padding-right: 20px; /* Adds space between items */
+}
+
+/* Connect wallet button */
+.connect-wallet-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.connect-wallet-button:hover {
+  background-color: #45a049;
+}
+
+/* Wallet Address Display */
+.wallet-address {
+  color: #fff; /* White color for wallet address */
+  font-weight: bold;
+  font-size: 16px;
+  display: none;
+}
+
+.wallet-address-visible {
+  display: inline; /* Display the wallet address */
+}
+
+/* Footer */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: rgba(0, 0, 0, 0.3); /* Fallback color with opacity */
+  backdrop-filter: blur(10px); /* Blur effect for modern browsers */
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.content p {
+  width: 80%;
+  margin: 0 auto;
+  text-align: justify;
+  line-height: 1.6;
+}
+
+
+.footer p {
+  color: #fff;
+  font-size: 14px;
 }
 
 .content {
@@ -20,4 +116,12 @@ body, html {
   color: #fff;
   text-align: center;
   margin-top: 20%;
+}
+
+/* Particle Container */
+#particles-js {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #000;
 }
